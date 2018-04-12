@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Popular_Movies</string>
+    <string name="movie_picture">movie picture</string>
+    <string name="release_date">Release Date</string>
+    <string name="vote_average">Vote Average</string>
+    <string name="plot_synopsis">Plot Synopsis</string>
+    <string name="toolbar_title">Pop Movies</string>
+    <string name="popular_movies">Popular movies</string>
+    <string name="top_rated_movies">Top rated movies</string>
+    <string name="no_internet">no internet</string>
+    <string name="loading">Loading...</string>
+</resources>
