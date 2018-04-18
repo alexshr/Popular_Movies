@@ -7,18 +7,24 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <!--   darker variant for the status bar and contextual app bars -->
         <item name="colorPrimaryDark">@android:color/black</item>
+
         <item name="android:textColorPrimary">@android:color/white</item>
         <item name="android:textColorPrimaryInverse">@android:color/black</item>
+        <item name="colorAccent">@color/colorAccent</item>
         <!--   theme UI controls like checkboxes and text fields -->
 
 
     </style>
 
-    <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-        <!-- android:textColorPrimary is the color of the title text in the Toolbar  -->
-        <item name="android:textColorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
+    <style name="fab_on">
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
+
+    <style name="fab_off">
+        <item name="colorAccent">@color/colorBackground</item>
+    </style>
+
+
 
 
     <!--

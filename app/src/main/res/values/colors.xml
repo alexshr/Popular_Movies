@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#212121</color>
+    <color name="colorAccent">#FF5252</color>
+
+
+    <color name="colorBackground">#fffafafa</color>
+    <color name="fab_off">@android:color/darker_gray</color>
+
+
     <!--
     <color name="navigationBarColor">#000000</color>
     <color name="textColorPrimary">#ffffff</color>

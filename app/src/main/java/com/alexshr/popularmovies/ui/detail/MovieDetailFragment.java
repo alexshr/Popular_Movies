@@ -74,12 +74,12 @@ public class MovieDetailFragment extends Fragment implements Injectable {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         movieViewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieDetailViewModel.class);
+        binding.get().setViewModel(movieViewModel);
 
-        movieViewModel.getMovieData().observe(this, binding.get()::setMovie);
-
-        movieViewModel.setMovie(getArguments().getParcelable(MOVIE_KEY));
-
+        Movie movie = getArguments().getParcelable(MOVIE_KEY);
+        movieViewModel.setMovie(movie);
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
@@ -89,4 +89,5 @@ public class MovieDetailFragment extends Fragment implements Injectable {
         }
         return super.onOptionsItemSelected(menuItem);
     }
+
 }

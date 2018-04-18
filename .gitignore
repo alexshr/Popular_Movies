@@ -64,3 +64,6 @@ fastlane/screenshots
 fastlane/test_output
 fastlane/readme.md
 
+/.idea/caches/build_file_checksums.ser
+/.idea/assetWizardSettings.xml
+libs/

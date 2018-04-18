@@ -30,8 +30,6 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-import static com.alexshr.popularmovies.AppConfig.POPULAR_PATH;
-import static com.alexshr.popularmovies.AppConfig.TOP_RATED_PATH;
 import static com.alexshr.popularmovies.AppConstants.PATH_KEY;
 
 /**
@@ -76,7 +74,7 @@ public class MovieListFragment extends Fragment implements Injectable {
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieListViewModel.class);
 
-        showTitle();
+        binding.get().setViewModel(viewModel);
 
         MovieListAdapter rvAdapter = new MovieListAdapter(dataBindingComponent, navigationController::navigateToDetail);
 
@@ -90,7 +88,7 @@ public class MovieListFragment extends Fragment implements Injectable {
         binding.get().movieList.addOnScrollListener(new EndlessRecyclerViewScrollListener((GridLayoutManager) binding.get().movieList.getLayoutManager()) {
             @Override
             public void onLoadMore() {
-                viewModel.loadPage();
+                if (viewModel.getPath() != null) viewModel.loadApiPage();
             }
 
             @Override
@@ -102,14 +100,10 @@ public class MovieListFragment extends Fragment implements Injectable {
         });
 
 
-
-
         viewModel.getErrorMessage().observe(this, this::showMessage);
 
 
         viewModel.getMoviesListData().observe(this, update -> {
-
-
 
             rvAdapter.replace(update);
 
@@ -119,11 +113,10 @@ public class MovieListFragment extends Fragment implements Injectable {
             }
         });
 
-        if (viewModel.getNextPage() == null) viewModel.startLoad();
+        if (!viewModel.isLoaded()) viewModel.startLoad();
+        //binding.get().setListName(getString(viewModel.getTitleRes()));
 
     }
-
-
 
 
     @Override
@@ -137,21 +130,15 @@ public class MovieListFragment extends Fragment implements Injectable {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.list_fragment_menu, menu);
         progressBar = menu.findItem(R.id.actionProgress);
-        viewModel.getProgressData().observe(this,progressBar::setVisible);
+        viewModel.getProgressData().observe(this, progressBar::setVisible);
 
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        viewModel.setPath(item.getItemId() == R.id.popular ? POPULAR_PATH : TOP_RATED_PATH);
-        viewModel.startLoad();
-        showTitle();
+        viewModel.startLoad(item.getItemId());
+        //binding.get().setListName(getString(viewModel.getTitleRes()));
         return true;
-    }
-
-    private void showTitle() {
-        binding.get().setListName(getString(
-                viewModel.getPath().equals(POPULAR_PATH) ? R.string.popular_movies : R.string.top_rated_movies));
     }
 
     public void showMessage(String message) {

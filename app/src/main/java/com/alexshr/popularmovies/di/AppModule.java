@@ -134,4 +134,10 @@ class AppModule {
     }
 
     //endregion
+
+    @Singleton
+    @Provides
+    Context provideContext(Application app) {
+        return app;
+    }
 }

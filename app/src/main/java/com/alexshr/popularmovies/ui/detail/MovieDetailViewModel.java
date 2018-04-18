@@ -1,8 +1,8 @@
 package com.alexshr.popularmovies.ui.detail;
 
-import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
+import com.alexshr.popularmovies.api.MoviesRepository;
 import com.alexshr.popularmovies.data.Movie;
 
 import javax.inject.Inject;
@@ -13,18 +13,42 @@ import javax.inject.Inject;
 
 public class MovieDetailViewModel extends ViewModel {
 
-    private MutableLiveData<Movie> movieData = new MutableLiveData<>();
+    private MoviesRepository repository;
+
+    //private MutableLiveData<Movie> movieData = new MutableLiveData<>();
+    private Movie movie;
+    //private MutableLiveData<Boolean> isFavoriteData = new MutableLiveData<>();
+    //private MutableLiveData<String> messageData = new MutableLiveData<>();
+
 
 
     @Inject
-    public MovieDetailViewModel() {
+    public MovieDetailViewModel(MoviesRepository rep) {
+        repository = rep;
     }
 
     public void setMovie(Movie movie) {
-        movieData.postValue(movie);
+        this.movie = movie;
+        movie.setFavorite(repository.isFavorite(movie.getId()));
+        //movieData.setValue(movie);
     }
 
-    public MutableLiveData<Movie> getMovieData() {
-        return movieData;
+    public void switchFavorite() {
+        if (movie.isFavorite()) {
+            repository.deleteFromFavorites(movie.getId());
+        } else {
+            repository.addToFavorites(movie);
+        }
+        movie.setFavorite(!movie.isFavorite());
     }
+
+    /*public MutableLiveData<Movie> getMovieData() {
+        return movieData;
+    }*/
+
+    public Movie getMovie() {
+        return movie;
+    }
+
+
 }

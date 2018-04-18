@@ -1,8 +1,11 @@
 package com.alexshr.popularmovies.data;
 
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.alexshr.popularmovies.BR;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -14,7 +17,7 @@ import static com.alexshr.popularmovies.AppConfig.POSTER_SIZE_W342;
 /**
  * Created by alexshr on 19.03.2018.
  */
-public class Movie implements Parcelable {
+public class Movie extends BaseObservable implements Parcelable {
 
     @SerializedName("vote_count")
     private Integer voteCount;
@@ -44,6 +47,8 @@ public class Movie implements Parcelable {
     private String overview;
     @SerializedName("release_date")
     private String releaseDate;
+
+    private boolean isFavorite;
 
 
     public Movie() {
@@ -175,6 +180,17 @@ public class Movie implements Parcelable {
     public String getRating() {
         return voteAverage + "/10";
     }
+
+    @Bindable
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
+        notifyPropertyChanged(BR.favorite);
+    }
+
     //endregion
 
 
