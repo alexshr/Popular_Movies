@@ -6,10 +6,13 @@ package com.alexshr.popularmovies;
 
 public interface AppConfig {
 
-    String API_KEY_NAME="api_key";
-    String API_KEY_VALUE="b3465885c51333d19c9cab79c7980218";
+    String API_KEY_PARAM = "api_key";
 
     String BASE_URL = "http://api.themoviedb.org/3/";
+
+    String YOUTUBE_THUMBNAIL = "https://img.youtube.com/vi/%s/hqdefault.jpg";
+
+    String YOUTUBE_VIDEO = "http://www.youtube.com/watch?v=%s";
 
     String BASE_POSTER_URL = "http://image.tmdb.org/t/p/";
     String POSTER_SIZE_W185 = "w185";
@@ -25,5 +28,4 @@ public interface AppConfig {
 
     int CACHE_SIZE = 10 * 1024 * 1024;//10 mb
     int CACHE_OFFLINE_MAX_STALE = 60 * 60 * 24 * 28; // tolerate 4-weeks stale for offline
-
 }

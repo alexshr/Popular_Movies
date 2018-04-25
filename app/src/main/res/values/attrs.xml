@@ -2,6 +2,7 @@
 <resources>
     <declare-styleable name="AspectRatioImageView">
         <attr name="aspect_ratio" format="float"/>
+        <attr name="is_height_calculated" format="boolean" />
     </declare-styleable>
 
 </resources>

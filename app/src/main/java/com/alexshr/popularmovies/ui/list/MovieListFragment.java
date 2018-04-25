@@ -1,10 +1,10 @@
 package com.alexshr.popularmovies.ui.list;
 
-
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -25,6 +25,7 @@ import com.alexshr.popularmovies.ui.NavigationController;
 import com.alexshr.popularmovies.util.AutoClearedValue;
 import com.alexshr.popularmovies.util.ConnectionChecker;
 import com.alexshr.popularmovies.util.EndlessRecyclerViewScrollListener;
+import com.alexshr.popularmovies.util.SpacingItemDecoration;
 
 import javax.inject.Inject;
 
@@ -49,13 +50,11 @@ public class MovieListFragment extends Fragment implements Injectable {
     private MovieListViewModel viewModel;
 
     private AutoClearedValue<ListFragmentBinding> binding;
-    //private AutoClearedValue<MovieListAdapter> mAdapter;
     private Integer startPos;
-    private MenuItem progressBar;
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         ListFragmentBinding dataBinding = DataBindingUtil.inflate(inflater, R.layout.list_fragment,
                 container, false, dataBindingComponent);
@@ -73,7 +72,6 @@ public class MovieListFragment extends Fragment implements Injectable {
         ((AppCompatActivity) getActivity()).setSupportActionBar(binding.get().toolbar);
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieListViewModel.class);
-
         binding.get().setViewModel(viewModel);
 
         MovieListAdapter rvAdapter = new MovieListAdapter(dataBindingComponent, navigationController::navigateToDetail);
@@ -84,6 +82,8 @@ public class MovieListFragment extends Fragment implements Injectable {
         startPos = viewModel.getScrollPosition();
 
         binding.get().movieList.setAdapter(rvAdapter);
+
+        binding.get().movieList.addItemDecoration(new SpacingItemDecoration(1));
 
         binding.get().movieList.addOnScrollListener(new EndlessRecyclerViewScrollListener((GridLayoutManager) binding.get().movieList.getLayoutManager()) {
             @Override
@@ -99,9 +99,7 @@ public class MovieListFragment extends Fragment implements Injectable {
             }
         });
 
-
-        viewModel.getErrorMessage().observe(this, this::showMessage);
-
+        viewModel.getErrorData().observe(this, this::showError);
 
         viewModel.getMoviesListData().observe(this, update -> {
 
@@ -113,31 +111,25 @@ public class MovieListFragment extends Fragment implements Injectable {
             }
         });
 
-        if (!viewModel.isLoaded()) viewModel.startLoad();
-        //binding.get().setListName(getString(viewModel.getTitleRes()));
-
+        viewModel.startLoad();
     }
 
-
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putString(PATH_KEY, viewModel.getPath());
         Timber.d("path=%s", viewModel.getPath());
     }
 
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.list_fragment_menu, menu);
-        progressBar = menu.findItem(R.id.actionProgress);
+        MenuItem progressBar = menu.findItem(R.id.progress);
         viewModel.getProgressData().observe(this, progressBar::setVisible);
-
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        viewModel.startLoad(item.getItemId());
-        //binding.get().setListName(getString(viewModel.getTitleRes()));
+        viewModel.switchMode(item.getItemId());
         return true;
     }
 
@@ -145,5 +137,8 @@ public class MovieListFragment extends Fragment implements Injectable {
         Snackbar.make(getActivity().findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
     }
 
-
+    public void showError(Throwable error) {
+        Timber.e(error);
+        if (connectionChecker.isConnected()) showMessage(error.getMessage());
+    }
 }

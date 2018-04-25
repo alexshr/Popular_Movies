@@ -1,5 +1,7 @@
 package com.alexshr.popularmovies.api;
 
+import com.alexshr.popularmovies.data.MovieReviews;
+import com.alexshr.popularmovies.data.MovieVideos;
 import com.alexshr.popularmovies.data.MoviesPage;
 
 import io.reactivex.Observable;
@@ -17,4 +19,9 @@ public interface ApiService {
     @GET("movie/{path}")
     Observable<Response<MoviesPage>> getMoviesObservable(@Path("path") String path, @Query("page") int page);
 
+    @GET("movie/{movie_id}/videos")
+    Observable<Response<MovieVideos>> getMovieVideosObservable(@Path("movie_id") int id);
+
+    @GET("movie/{movie_id}/reviews")
+    Observable<Response<MovieReviews>> getMovieReviewsObservable(@Path("movie_id") int id);
 }

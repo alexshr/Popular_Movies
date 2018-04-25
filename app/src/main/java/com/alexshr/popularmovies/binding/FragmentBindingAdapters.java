@@ -26,15 +26,8 @@ public class FragmentBindingAdapters {
                 .into(imageView);
     }
 
-    /*@BindingAdapter("backgroundTint")
-    public void setFabColor(FloatingActionButton fab, boolean isFavorite) {
-        int colorRes=isFavorite? R.attr.colorAccent:android.R.attr.colorBackground;
-        fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(fab.getContext(), R.color.colorAccent)));
-    }*/
-
     @BindingAdapter("app:backgroundTint")
     public void setFabColor(FloatingActionButton fab, int color) {
-        //fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(fab.getContext(), color)));
         fab.setBackgroundTintList(ColorStateList.valueOf(color));
 
     }

@@ -8,8 +8,6 @@ import android.os.Parcelable;
 import com.alexshr.popularmovies.BR;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
-
 import static com.alexshr.popularmovies.AppConfig.BASE_POSTER_URL;
 import static com.alexshr.popularmovies.AppConfig.POSTER_SIZE_W185;
 import static com.alexshr.popularmovies.AppConfig.POSTER_SIZE_W342;
@@ -19,12 +17,8 @@ import static com.alexshr.popularmovies.AppConfig.POSTER_SIZE_W342;
  */
 public class Movie extends BaseObservable implements Parcelable {
 
-    @SerializedName("vote_count")
-    private Integer voteCount;
     @SerializedName("id")
     private Integer id;
-    @SerializedName("video")
-    private Boolean video;
     @SerializedName("vote_average")
     private Double voteAverage;
     @SerializedName("title")
@@ -33,16 +27,8 @@ public class Movie extends BaseObservable implements Parcelable {
     private Double popularity;
     @SerializedName("poster_path")
     private String posterPath;
-    @SerializedName("original_language")
-    private String originalLanguage;
-    @SerializedName("original_title")
-    private String originalTitle;
-    @SerializedName("genre_ids")
-    private List<Integer> genreIds = null;
     @SerializedName("backdrop_path")
     private String backdropPath;
-    @SerializedName("adult")
-    private Boolean adult;
     @SerializedName("overview")
     private String overview;
     @SerializedName("release_date")
@@ -50,16 +36,7 @@ public class Movie extends BaseObservable implements Parcelable {
 
     private boolean isFavorite;
 
-
     public Movie() {
-    }
-
-    public Integer getVoteCount() {
-        return voteCount;
-    }
-
-    public void setVoteCount(Integer voteCount) {
-        this.voteCount = voteCount;
     }
 
     public Integer getId() {
@@ -68,14 +45,6 @@ public class Movie extends BaseObservable implements Parcelable {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Boolean getVideo() {
-        return video;
-    }
-
-    public void setVideo(Boolean video) {
-        this.video = video;
     }
 
     public Double getVoteAverage() {
@@ -106,33 +75,8 @@ public class Movie extends BaseObservable implements Parcelable {
         return posterPath;
     }
 
-
     public void setPosterPath(String posterPath) {
         this.posterPath = posterPath;
-    }
-
-    public String getOriginalLanguage() {
-        return originalLanguage;
-    }
-
-    public void setOriginalLanguage(String originalLanguage) {
-        this.originalLanguage = originalLanguage;
-    }
-
-    public String getOriginalTitle() {
-        return originalTitle;
-    }
-
-    public void setOriginalTitle(String originalTitle) {
-        this.originalTitle = originalTitle;
-    }
-
-    public List<Integer> getGenreIds() {
-        return genreIds;
-    }
-
-    public void setGenreIds(List<Integer> genreIds) {
-        this.genreIds = genreIds;
     }
 
     public String getBackdropPath() {
@@ -141,14 +85,6 @@ public class Movie extends BaseObservable implements Parcelable {
 
     public void setBackdropPath(String backdropPath) {
         this.backdropPath = backdropPath;
-    }
-
-    public Boolean getAdult() {
-        return adult;
-    }
-
-    public void setAdult(Boolean adult) {
-        this.adult = adult;
     }
 
     public String getOverview() {
@@ -167,7 +103,6 @@ public class Movie extends BaseObservable implements Parcelable {
         this.releaseDate = releaseDate;
     }
 
-
     //region ================= additional methods =================
     public String getPosterUrl() {
         return BASE_POSTER_URL + POSTER_SIZE_W185 + posterPath;
@@ -181,6 +116,7 @@ public class Movie extends BaseObservable implements Parcelable {
         return voteAverage + "/10";
     }
 
+    //region ================= Bindable =================
     @Bindable
     public boolean isFavorite() {
         return isFavorite;
@@ -193,7 +129,6 @@ public class Movie extends BaseObservable implements Parcelable {
 
     //endregion
 
-
     //region ================= parcelable support =================
     public final static Creator<Movie> CREATOR = new Creator<Movie>() {
 
@@ -204,39 +139,26 @@ public class Movie extends BaseObservable implements Parcelable {
         public Movie[] newArray(int size) {
             return (new Movie[size]);
         }
-
     };
 
     private Movie(Parcel in) {
-        this.voteCount = ((Integer) in.readValue((Integer.class.getClassLoader())));
         this.id = ((Integer) in.readValue((Integer.class.getClassLoader())));
-        this.video = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
         this.voteAverage = ((Double) in.readValue((Double.class.getClassLoader())));
         this.title = ((String) in.readValue((String.class.getClassLoader())));
         this.popularity = ((Double) in.readValue((Double.class.getClassLoader())));
         this.posterPath = ((String) in.readValue((String.class.getClassLoader())));
-        this.originalLanguage = ((String) in.readValue((String.class.getClassLoader())));
-        this.originalTitle = ((String) in.readValue((String.class.getClassLoader())));
-        in.readList(this.genreIds, (Integer.class.getClassLoader()));
         this.backdropPath = ((String) in.readValue((String.class.getClassLoader())));
-        this.adult = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
         this.overview = ((String) in.readValue((String.class.getClassLoader())));
         this.releaseDate = ((String) in.readValue((String.class.getClassLoader())));
     }
 
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(voteCount);
         dest.writeValue(id);
-        dest.writeValue(video);
         dest.writeValue(voteAverage);
         dest.writeValue(title);
         dest.writeValue(popularity);
         dest.writeValue(posterPath);
-        dest.writeValue(originalLanguage);
-        dest.writeValue(originalTitle);
-        dest.writeList(genreIds);
         dest.writeValue(backdropPath);
-        dest.writeValue(adult);
         dest.writeValue(overview);
         dest.writeValue(releaseDate);
     }
@@ -249,22 +171,15 @@ public class Movie extends BaseObservable implements Parcelable {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Movie{");
-        sb.append("voteCount=").append(voteCount);
-        sb.append(", id=").append(id);
-        sb.append(", video=").append(video);
+        sb.append("id=").append(id);
         sb.append(", voteAverage=").append(voteAverage);
         sb.append(", title='").append(title).append('\'');
         sb.append(", popularity=").append(popularity);
         sb.append(", posterPath='").append(posterPath).append('\'');
-        sb.append(", originalLanguage='").append(originalLanguage).append('\'');
-        sb.append(", originalTitle='").append(originalTitle).append('\'');
-        sb.append(", genreIds=").append(genreIds);
         sb.append(", backdropPath='").append(backdropPath).append('\'');
-        sb.append(", adult=").append(adult);
         sb.append(", overview='").append(overview).append('\'');
         sb.append(", releaseDate='").append(releaseDate).append('\'');
-        sb.append(", posterUrl='").append(getPosterUrl()).append('\'');
-        sb.append(", backdropUrl='").append(getBackdropUrl()).append('\'');
+        sb.append(", isFavorite=").append(isFavorite);
         sb.append('}');
         return sb.toString();
     }

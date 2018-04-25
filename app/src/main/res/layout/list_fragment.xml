@@ -5,12 +5,9 @@
 
     <data>
 
-        
-
         <variable
             name="viewModel"
             type="com.alexshr.popularmovies.ui.list.MovieListViewModel" />
-
 
     </data>
 
@@ -24,21 +21,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:title="@{context.getString(viewModel.titleRes)}"
-             />
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:title="@{context.getString(viewModel.titleRes)}" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/movie_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layoutManager="android.support.v7.widget.GridLayoutManager"
-
             app:spanCount="@integer/span_count"
+
             tools:listitem="@layout/movie_item" />
 
     </LinearLayout>
-
 
 </layout>

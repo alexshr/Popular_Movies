@@ -7,11 +7,15 @@ import android.util.AttributeSet;
 
 import com.alexshr.popularmovies.R;
 
+/**
+ * Maintains an aspect ratio based on either width or height
+ */
 public class AspectRatioImageView extends AppCompatImageView {
 
     private static final float DEFAULT_ASPECT_RATIO = 1f;
 
     private float aspectRatio;
+    private boolean isHeightCalculated;
 
     public AspectRatioImageView(Context context) {
         this(context, null);
@@ -22,6 +26,8 @@ public class AspectRatioImageView extends AppCompatImageView {
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.AspectRatioImageView);
         aspectRatio = a.getFloat(R.styleable.AspectRatioImageView_aspect_ratio, DEFAULT_ASPECT_RATIO);
+        isHeightCalculated = a.getBoolean(R.styleable.AspectRatioImageView_is_height_calculated,
+                true);
 
         a.recycle();
     }
@@ -32,9 +38,13 @@ public class AspectRatioImageView extends AppCompatImageView {
 
         int newWidth;
         int newHeight;
-
-        newWidth = getMeasuredWidth();
-        newHeight = (int) (newWidth * aspectRatio);
+        if (isHeightCalculated) {
+            newWidth = getMeasuredWidth();
+            newHeight = (int) (newWidth * aspectRatio);
+        } else {
+            newHeight = getMeasuredHeight();
+            newWidth = (int) (newHeight * aspectRatio);
+        }
 
         setMeasuredDimension(newWidth, newHeight);
     }
@@ -54,5 +64,12 @@ public class AspectRatioImageView extends AppCompatImageView {
         requestLayout();
     }
 
+    public boolean isHeightCalculated() {
+        return isHeightCalculated;
+    }
 
+    public void setHeightCalculated(boolean heightCalculated) {
+        isHeightCalculated = heightCalculated;
+        requestLayout();
+    }
 }

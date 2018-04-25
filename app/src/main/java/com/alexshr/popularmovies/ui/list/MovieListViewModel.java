@@ -30,15 +30,13 @@ public class MovieListViewModel extends ViewModel {
     private MoviesRepository repository;
 
     private MutableLiveData<List<Movie>> moviesListData = new MutableLiveData<>();
-    private MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private MutableLiveData<Throwable> errorData = new MutableLiveData<>();
     private MutableLiveData<Boolean> progressData = new MutableLiveData<>();
 
     private Integer nextPage;
     private Integer totalPages;
     private int scrollPosition;
-    //private boolean loaded;
     private String path = AppConfig.POPULAR_PATH;
-    //private int titleRes = R.string.popular_movies;
     public final ObservableInt titleRes =
             new ObservableInt(R.string.popular_movies);
 
@@ -47,20 +45,23 @@ public class MovieListViewModel extends ViewModel {
         repository = rep;
     }
 
+    @Override
+    protected void onCleared() {
+        errorData = new MutableLiveData<>();
+        progressData = new MutableLiveData<>();
+    }
+
     public void loadApiPage() {
+        if (nextPage == null) nextPage = 1;
         Timber.d("path=%s; nextPage=%d; mTotalPage=%d", path, nextPage, totalPages);
         if (totalPages == null || nextPage <= totalPages) {
             progressData.postValue(true);
-            repository.getApiObservable(path, nextPage)
+            repository.getMoviesObservable(path, nextPage)
                     .doFinally(() -> progressData.postValue(false))
-                    .subscribe(this::onData, this::onError);
+                    .subscribe(this::onData, errorData::postValue);
         }
     }
 
-    private void onError(Throwable e) {
-        String mes = e.getMessage().contains("UnknownHostException") ? "no_internet" : e.getMessage();
-        errorMessage.postValue(mes);
-    }
 
     private void onData(MoviesPage moviesPage) {
         totalPages = moviesPage.getTotalPages();
@@ -69,7 +70,8 @@ public class MovieListViewModel extends ViewModel {
         Timber.d("path=%s; nextPage=%d; mTotalPage=%d;", path, nextPage, totalPages);
     }
 
-    public void startLoad(int menuId) {
+    public void switchMode(int menuId) {
+        nextPage = null;
         switch (menuId) {
             case R.id.popular:
                 path = POPULAR_PATH;
@@ -78,21 +80,22 @@ public class MovieListViewModel extends ViewModel {
             case R.id.top_rated:
                 path = TOP_RATED_PATH;
                 titleRes.set(R.string.top_rated_movies);
-                //titleRes = R.string.top_rated_movies;
                 break;
             default:
                 path = null;
                 titleRes.set(R.string.favorites);
-                //titleRes = R.string.favorites;
         }
         startLoad();
     }
 
     public void startLoad() {
-        nextPage = 1;
-        moviesListData.setValue(new ArrayList<>());
-        if(path!=null) loadApiPage();
-        else loadFavorites();
+        if (nextPage == null || path == null) {
+            moviesListData.setValue(new ArrayList<>());
+            if (path != null) {
+                nextPage = 1;
+                loadApiPage();
+            } else loadFavorites();
+        }
     }
 
     public void loadFavorites() {
@@ -117,8 +120,8 @@ public class MovieListViewModel extends ViewModel {
         return moviesListData;
     }
 
-    public MutableLiveData<String> getErrorMessage() {
-        return errorMessage;
+    public MutableLiveData<Throwable> getErrorData() {
+        return errorData;
     }
 
     public MutableLiveData<Boolean> getProgressData() {
@@ -144,11 +147,5 @@ public class MovieListViewModel extends ViewModel {
     public int getScrollPosition() {
         return scrollPosition;
     }
-
-    public boolean isLoaded() {
-        return nextPage != null;
-    }
-
-
 }
 

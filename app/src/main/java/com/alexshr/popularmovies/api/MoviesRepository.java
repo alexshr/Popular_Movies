@@ -1,7 +1,11 @@
 package com.alexshr.popularmovies.api;
 
 import com.alexshr.popularmovies.data.Movie;
+import com.alexshr.popularmovies.data.MovieReviews;
+import com.alexshr.popularmovies.data.MovieVideos;
 import com.alexshr.popularmovies.data.MoviesPage;
+import com.alexshr.popularmovies.data.Review;
+import com.alexshr.popularmovies.data.Video;
 import com.alexshr.popularmovies.provider.MoviesClient;
 import com.alexshr.popularmovies.rx.RestCallTransformer;
 
@@ -12,9 +16,6 @@ import javax.inject.Singleton;
 
 import io.reactivex.Observable;
 
-/**
- * Created by alexshr on 20.03.2018.
- */
 @Singleton
 public class MoviesRepository {
     private ApiService apiService;
@@ -27,9 +28,21 @@ public class MoviesRepository {
 
     }
 
-    public Observable<MoviesPage> getApiObservable(String path, int page) {
+    public Observable<MoviesPage> getMoviesObservable(String path, int page) {
         return apiService.getMoviesObservable(path, page)
                 .compose(new RestCallTransformer<>());
+    }
+
+    public Observable<List<Video>> getMovieVideosObservable(int moviedId) {
+        return apiService.getMovieVideosObservable(moviedId)
+                .compose(new RestCallTransformer<>())
+                .map(MovieVideos::getResults);
+    }
+
+    public Observable<List<Review>> getMovieReviewsObservable(int moviedId) {
+        return apiService.getMovieReviewsObservable(moviedId)
+                .compose(new RestCallTransformer<>())
+                .map(MovieReviews::getResults);
     }
 
     public Observable<List<Movie>> getFavoritesObservable() {
