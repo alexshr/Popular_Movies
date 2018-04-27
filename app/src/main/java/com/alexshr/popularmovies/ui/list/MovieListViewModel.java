@@ -35,7 +35,7 @@ public class MovieListViewModel extends ViewModel {
 
     private Integer nextPage;
     private Integer totalPages;
-    private int scrollPosition;
+    private Integer scrollPosition;
     private String path = AppConfig.POPULAR_PATH;
     public final ObservableInt titleRes =
             new ObservableInt(R.string.popular_movies);
@@ -45,10 +45,16 @@ public class MovieListViewModel extends ViewModel {
         repository = rep;
     }
 
-    @Override
-    protected void onCleared() {
+    public void init() {
         errorData = new MutableLiveData<>();
         progressData = new MutableLiveData<>();
+        if (path == null) moviesListData = new MutableLiveData<>();//to force reloading
+    }
+
+    @Override
+    protected void onCleared() {
+        Timber.d("onClear");
+        moviesListData = null;
     }
 
     public void loadApiPage() {
@@ -62,7 +68,6 @@ public class MovieListViewModel extends ViewModel {
         }
     }
 
-
     private void onData(MoviesPage moviesPage) {
         totalPages = moviesPage.getTotalPages();
         nextPage = moviesPage.getPage() + 1;
@@ -70,8 +75,8 @@ public class MovieListViewModel extends ViewModel {
         Timber.d("path=%s; nextPage=%d; mTotalPage=%d;", path, nextPage, totalPages);
     }
 
-    public void switchMode(int menuId) {
-        nextPage = null;
+    public void startLoading(int menuId) {
+        //nextPage = null;
         switch (menuId) {
             case R.id.popular:
                 path = POPULAR_PATH;
@@ -85,17 +90,18 @@ public class MovieListViewModel extends ViewModel {
                 path = null;
                 titleRes.set(R.string.favorites);
         }
-        startLoad();
+
+        startLoading();
     }
 
-    public void startLoad() {
-        if (nextPage == null || path == null) {
-            moviesListData.setValue(new ArrayList<>());
-            if (path != null) {
-                nextPage = 1;
-                loadApiPage();
-            } else loadFavorites();
+    public void startLoading() {
+        if (moviesListData.getValue() != null) {
+            moviesListData.getValue().clear();
         }
+        if (path != null) {
+            nextPage = 1;
+            loadApiPage();
+        } else loadFavorites();
     }
 
     public void loadFavorites() {
@@ -106,13 +112,12 @@ public class MovieListViewModel extends ViewModel {
 
     private void updateMoviesData(List<Movie> pageData) {
 
-        if (pageData.isEmpty()) return;
-
         List<Movie> data = new ArrayList<>();
         if (moviesListData.getValue() != null) data.addAll(moviesListData.getValue());
 
         data.addAll(pageData);
 
+        Timber.d("moviesListData.postValue size=%d", data.size());
         moviesListData.postValue(data);
     }
 
@@ -136,15 +141,11 @@ public class MovieListViewModel extends ViewModel {
         this.path = path;
     }
 
-    public Integer getNextPage() {
-        return nextPage;
-    }
-
-    public void setScrollPosition(int scrollPosition) {
+    public void setScrollPosition(Integer scrollPosition) {
         this.scrollPosition = scrollPosition;
     }
 
-    public int getScrollPosition() {
+    public Integer getScrollPosition() {
         return scrollPosition;
     }
 }

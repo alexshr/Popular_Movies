@@ -80,7 +80,7 @@ public abstract class DataBoundListAdapter<T, V extends ViewDataBinding>
     @SuppressLint("StaticFieldLeak")
     @MainThread
     public void replace(List<T> update) {
-        Timber.d("items: %s;update size=%d", items == null ? "null" : items.size(), update.size());
+        //Timber.d("items: %s;update size=%d", items == null ? "null" : items.size(), update.size());
         dataVersion++;
         if (items == null) {
             if (update == null) {
@@ -136,12 +136,10 @@ public abstract class DataBoundListAdapter<T, V extends ViewDataBinding>
                     Timber.d("dispatch updates");
                     items = update;
                     diffResult.dispatchUpdatesTo(DataBoundListAdapter.this);
-
                 }
             }.execute();
         }
     }
-
 
     protected abstract void bind(V binding, T item);
 

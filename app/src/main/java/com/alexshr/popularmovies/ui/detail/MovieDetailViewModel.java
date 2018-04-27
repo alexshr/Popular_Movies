@@ -12,6 +12,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 public class MovieDetailViewModel extends ViewModel {
 
     private MoviesRepository repository;
@@ -35,6 +37,17 @@ public class MovieDetailViewModel extends ViewModel {
     public void setMovie(Movie movie) {
         this.movie = movie;
         movie.setFavorite(repository.isFavorite(movie.getId()));
+    }
+
+    @Override
+    protected void onCleared() {
+        Timber.d("onClear");
+        videosData = null;
+        reviewsData = null;
+        errorData = null;
+        progressData = null;
+        movie = null;
+        repository = null;
     }
 
     public void switchFavorite() {

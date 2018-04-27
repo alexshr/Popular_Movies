@@ -46,9 +46,12 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
     }
 
     @Override
+    /*
+    Not for production.
+    (Approach for production: https://thebhwgroup.com/blog/how-android-sqlite-onupgrade.)
+    */
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + MoviesContract.MoviesEntry.TABLE_NAME);
         onCreate(db);
     }
-
 }

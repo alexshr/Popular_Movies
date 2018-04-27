@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.alexshr.popularmovies.R;
+import com.alexshr.popularmovies.binding.DataBoundListAdapter;
 import com.alexshr.popularmovies.binding.FragmentDataBindingComponent;
 import com.alexshr.popularmovies.databinding.ListFragmentBinding;
 import com.alexshr.popularmovies.di.Injectable;
@@ -50,7 +52,8 @@ public class MovieListFragment extends Fragment implements Injectable {
     private MovieListViewModel viewModel;
 
     private AutoClearedValue<ListFragmentBinding> binding;
-    private Integer startPos;
+
+    private Integer positionToScroll;
 
     @Nullable
     @Override
@@ -72,14 +75,16 @@ public class MovieListFragment extends Fragment implements Injectable {
         ((AppCompatActivity) getActivity()).setSupportActionBar(binding.get().toolbar);
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieListViewModel.class);
-        binding.get().setViewModel(viewModel);
-
-        MovieListAdapter rvAdapter = new MovieListAdapter(dataBindingComponent, navigationController::navigateToDetail);
 
         if (outState != null) {
             viewModel.setPath(outState.getString(PATH_KEY));
         }
-        startPos = viewModel.getScrollPosition();
+
+        viewModel.init();
+
+        binding.get().setViewModel(viewModel);
+
+        MovieListAdapter rvAdapter = new MovieListAdapter(dataBindingComponent, navigationController::navigateToDetail);
 
         binding.get().movieList.setAdapter(rvAdapter);
 
@@ -93,25 +98,32 @@ public class MovieListFragment extends Fragment implements Injectable {
 
             @Override
             public void onScrollPositionChanged(int pos) {
-                if (!connectionChecker.isConnected()) showMessage("no_internet");
+                if (!connectionChecker.isConnected()) showMessage(getString(R.string.no_internet));
                 viewModel.setScrollPosition(pos);
                 Timber.d("scrollPosition=%d", viewModel.getScrollPosition());
+                binding.get().movieList.setVisibility(View.VISIBLE);
             }
         });
 
         viewModel.getErrorData().observe(this, this::showError);
 
-        viewModel.getMoviesListData().observe(this, update -> {
+        positionToScroll = viewModel.getScrollPosition();
 
+        viewModel.getMoviesListData().observe(this, update -> {
+            Timber.d("!!onChanged path=%s size=%d", viewModel.getPath(), update.size());
             rvAdapter.replace(update);
 
-            if (startPos != null) {
-                binding.get().movieList.getLayoutManager().scrollToPosition(startPos);
-                startPos = null;
+            if (positionToScroll != null) {
+                new Handler().postDelayed(() -> binding.get().movieList.scrollToPosition(viewModel.getScrollPosition()), 100);
+                positionToScroll = null;
             }
         });
 
-        viewModel.startLoad();
+        if (viewModel.getMoviesListData().getValue() == null || viewModel.getMoviesListData().getValue().isEmpty()) {
+            viewModel.startLoading();
+        }
+
+        if (!connectionChecker.isConnected()) showMessage(getString(R.string.no_internet));
     }
 
     @Override
@@ -129,7 +141,9 @@ public class MovieListFragment extends Fragment implements Injectable {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        viewModel.switchMode(item.getItemId());
+        ((DataBoundListAdapter) binding.get().movieList.getAdapter()).replace(null);
+        if (!connectionChecker.isConnected()) showMessage(getString(R.string.no_internet));
+        viewModel.startLoading(item.getItemId());
         return true;
     }
 
