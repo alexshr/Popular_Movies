@@ -1,2 +1,2 @@
-# Popular_Movies 
-(Android Developer Nanodegree program)
+ 
+Hometask project for Android Developer Nanodegree program
