@@ -3,6 +3,7 @@ package com.alexshr.popularmovies.ui.detail;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.databinding.DataBindingComponent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
@@ -50,7 +51,7 @@ public class MovieDetailFragment extends Fragment implements Injectable {
     @Inject
     ConnectionChecker connectionChecker;
 
-    android.databinding.DataBindingComponent dataBindingComponent = new FragmentDataBindingComponent(this);
+    DataBindingComponent dataBindingComponent = new FragmentDataBindingComponent(this);
 
     private MovieDetailViewModel viewModel;
 
@@ -59,7 +60,7 @@ public class MovieDetailFragment extends Fragment implements Injectable {
     AutoClearedValue<DetailFragmentBinding> binding;
 
     public static MovieDetailFragment create(Movie movie) {
-        Timber.d("movie:" + movie);
+        Timber.d("movie: %s", movie);
         MovieDetailFragment detailFragment = new MovieDetailFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable(MOVIE_KEY, movie);
@@ -155,15 +156,14 @@ public class MovieDetailFragment extends Fragment implements Injectable {
     }
 
     private Intent getShareIntent() {
-        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND)
+
+        return new Intent(Intent.ACTION_SEND)
                 .setType("text/plain")
 
                 .putExtra(Intent.EXTRA_TITLE, viewModel.getMovie().getTitle() + " - " + sharedVideo.getName())
                 .putExtra(Intent.EXTRA_SUBJECT, viewModel.getMovie().getTitle() + " - " + sharedVideo.getName())
                 .putExtra(Intent.EXTRA_TITLE, viewModel.getMovie().getTitle() + " - " + sharedVideo.getName())
                 .putExtra(Intent.EXTRA_TEXT, sharedVideo.getVideoUrl());
-
-        return sharingIntent;
 
         //return Intent.createChooser(sharingIntent, getString(R.string.share_trailer));
     }

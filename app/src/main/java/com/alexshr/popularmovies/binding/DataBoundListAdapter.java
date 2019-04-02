@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2017 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.alexshr.popularmovies.binding;
 
 import android.annotation.SuppressLint;
@@ -28,7 +12,10 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
+import io.reactivex.functions.Consumer;
 import timber.log.Timber;
+
+import static android.support.v7.widget.RecyclerView.NO_POSITION;
 
 /**
  * A generic RecyclerView adapter that uses Data Binding & DiffUtil.
@@ -39,12 +26,13 @@ import timber.log.Timber;
 public abstract class DataBoundListAdapter<T, V extends ViewDataBinding>
         extends RecyclerView.Adapter<DataBoundViewHolder<V>> {
 
+    protected int selectedPos = NO_POSITION;
+    protected Consumer<T> itemClickCallback;
     @Nullable
     private List<T> items;
     // each time data is set, we update this variable so that if DiffUtil calculation returns
     // after repetitive updates, we can ignore the old calculation
     private int dataVersion = 0;
-
     private RecyclerView rw;
 
     @Override
@@ -72,6 +60,17 @@ public abstract class DataBoundListAdapter<T, V extends ViewDataBinding>
     @Override
     public final void onBindViewHolder(DataBoundViewHolder<V> holder, int position) {
         //noinspection ConstantConditions
+        holder.itemView.setPressed(position == selectedPos);
+
+        holder.itemView.setOnClickListener(v -> {
+            try {
+                if (itemClickCallback != null)
+                    itemClickCallback.accept(items.get(position));
+            } catch (Exception e) {
+                Timber.e(e);
+            }
+        });
+
         bind(holder.binding, items.get(position));
         holder.binding.executePendingBindings();
     }
@@ -79,7 +78,7 @@ public abstract class DataBoundListAdapter<T, V extends ViewDataBinding>
     //@SuppressLint("StaticFieldLeak")
     @SuppressLint("StaticFieldLeak")
     @MainThread
-    public void replace(List<T> update) {
+    public void replace(final List<T> update) {
         //Timber.d("items: %s;update size=%d", items == null ? "null" : items.size(), update.size());
         dataVersion++;
         if (items == null) {
@@ -96,6 +95,7 @@ public abstract class DataBoundListAdapter<T, V extends ViewDataBinding>
             final int startVersion = dataVersion;
             final List<T> oldItems = items;
             new AsyncTask<Void, Void, DiffUtil.DiffResult>() {
+                @SuppressLint("WrongThread")
                 @Override
                 protected DiffUtil.DiffResult doInBackground(Void... voids) {
                     return DiffUtil.calculateDiff(new DiffUtil.Callback() {
@@ -139,6 +139,11 @@ public abstract class DataBoundListAdapter<T, V extends ViewDataBinding>
                 }
             }.execute();
         }
+    }
+
+    public void selectItem(int pos) {
+        selectedPos = pos;
+        notifyDataSetChanged();
     }
 
     protected abstract void bind(V binding, T item);

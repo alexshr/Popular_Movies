@@ -24,5 +24,5 @@ public interface AppComponent {
         Builder application(Application application);
         AppComponent build();
     }
-    void inject(MoviesApp githubApp);
+    void inject(MoviesApp app);
 }

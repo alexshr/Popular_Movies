@@ -14,6 +14,7 @@ import dagger.android.HasActivityInjector;
 import timber.log.Timber;
 import timber.log.Timber.DebugTree;
 
+import static com.alexshr.popularmovies.BuildConfig.DEBUG;
 
 public class MoviesApp extends Application implements HasActivityInjector {
 
@@ -22,8 +23,8 @@ public class MoviesApp extends Application implements HasActivityInjector {
     @Override
     public void onCreate() {
         super.onCreate();
-
-        if (BuildConfig.DEBUG) {
+        AppInjector.init(this);
+        if (DEBUG) {
             Timber.plant(new DebugTree() {
                 @SuppressLint("DefaultLocale")
                 @Override
@@ -35,7 +36,7 @@ public class MoviesApp extends Application implements HasActivityInjector {
                             Thread.currentThread().getName());
                 }
             });
-            AppInjector.init(this);
+
         }
     }
 
