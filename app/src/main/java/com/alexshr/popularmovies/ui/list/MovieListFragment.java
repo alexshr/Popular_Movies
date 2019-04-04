@@ -4,13 +4,11 @@ import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,21 +17,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.alexshr.popularmovies.R;
-import com.alexshr.popularmovies.binding.DataBoundListAdapter;
 import com.alexshr.popularmovies.binding.FragmentDataBindingComponent;
 import com.alexshr.popularmovies.databinding.ListFragmentBinding;
 import com.alexshr.popularmovies.di.Injectable;
 import com.alexshr.popularmovies.ui.NavigationController;
 import com.alexshr.popularmovies.util.AutoClearedValue;
 import com.alexshr.popularmovies.util.ConnectionChecker;
-import com.alexshr.popularmovies.util.EndlessRecyclerViewScrollListener;
 import com.alexshr.popularmovies.util.SpacingItemDecoration;
 
 import javax.inject.Inject;
 
 import timber.log.Timber;
 
-import static com.alexshr.popularmovies.AppConstants.PATH_KEY;
+import static com.alexshr.popularmovies.AppConstants.MENU_ITEM_KEY;
 
 /**
  * Created by alexshr on 27.03.2018.
@@ -52,8 +48,6 @@ public class MovieListFragment extends Fragment implements Injectable {
     private MovieListViewModel viewModel;
 
     private AutoClearedValue<ListFragmentBinding> binding;
-
-    private Integer positionToScroll;
 
     @Nullable
     @Override
@@ -76,60 +70,36 @@ public class MovieListFragment extends Fragment implements Injectable {
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieListViewModel.class);
 
-        if (outState != null) {
-            viewModel.setPath(outState.getString(PATH_KEY));
-        }
+        int menuItemId = (outState != null) ? outState.getInt(MENU_ITEM_KEY) : R.id.popular;
 
-        viewModel.init();
+        initMovieList();
+
+        switchTo(menuItemId);
+
+        binding.get().setViewModel(viewModel);
+    }
+
+    private void initMovieList() {
+        MoviePagedListAdapter adapter = new MoviePagedListAdapter(dataBindingComponent, navigationController::navigateToDetail);
+        binding.get().movieList.setAdapter(adapter);
 
         binding.get().setViewModel(viewModel);
 
-        MovieListAdapter rvAdapter = new MovieListAdapter(dataBindingComponent, navigationController::navigateToDetail);
-
-        binding.get().movieList.setAdapter(rvAdapter);
-
         binding.get().movieList.addItemDecoration(new SpacingItemDecoration(1));
+    }
 
-        binding.get().movieList.addOnScrollListener(new EndlessRecyclerViewScrollListener((GridLayoutManager) binding.get().movieList.getLayoutManager()) {
-            @Override
-            public void onLoadMore() {
-                if (viewModel.getPath() != null) viewModel.loadApiPage();
-            }
-
-            @Override
-            public void onScrollPositionChanged(int pos) {
-                if (!connectionChecker.isConnected()) showMessage(getString(R.string.no_internet));
-                viewModel.setScrollPosition(pos);
-                Timber.d("scrollPosition=%d", viewModel.getScrollPosition());
-                binding.get().movieList.setVisibility(View.VISIBLE);
-            }
-        });
-
+    private void switchTo(int menuItemId) {
+        MoviePagedListAdapter adapter = (MoviePagedListAdapter) binding.get().movieList.getAdapter();
+        viewModel.switchTo(menuItemId);
         viewModel.getErrorData().observe(this, this::showError);
-
-        positionToScroll = viewModel.getScrollPosition();
-
-        viewModel.getMoviesListData().observe(this, update -> {
-            Timber.d("!!onChanged path=%s size=%d", viewModel.getPath(), update.size());
-            rvAdapter.replace(update);
-
-            if (positionToScroll != null) {
-                new Handler().postDelayed(() -> binding.get().movieList.scrollToPosition(viewModel.getScrollPosition()), 100);
-                positionToScroll = null;
-            }
-        });
-
-        if (viewModel.getMoviesListData().getValue() == null || viewModel.getMoviesListData().getValue().isEmpty()) {
-            viewModel.startLoading();
-        }
-
-        if (!connectionChecker.isConnected()) showMessage(getString(R.string.no_internet));
+        viewModel.getPagedMoviesData().observe(this, adapter::submitList);
+        checkConnection();
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putString(PATH_KEY, viewModel.getPath());
-        Timber.d("path=%s", viewModel.getPath());
+        outState.putInt(MENU_ITEM_KEY, viewModel.getMenuItemId());
+        Timber.d("menuItemId=%d", viewModel.getMenuItemId());
     }
 
     @Override
@@ -141,9 +111,7 @@ public class MovieListFragment extends Fragment implements Injectable {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        ((DataBoundListAdapter) binding.get().movieList.getAdapter()).replace(null);
-        if (!connectionChecker.isConnected()) showMessage(getString(R.string.no_internet));
-        viewModel.startLoading(item.getItemId());
+        switchTo(item.getItemId());
         return true;
     }
 
@@ -153,6 +121,10 @@ public class MovieListFragment extends Fragment implements Injectable {
 
     public void showError(Throwable error) {
         Timber.e(error);
-        if (connectionChecker.isConnected()) showMessage(error.getMessage());
+        showMessage(error.getMessage());
+    }
+
+    private void checkConnection() {
+        if (!connectionChecker.isConnected()) showMessage(getString(R.string.no_internet));
     }
 }

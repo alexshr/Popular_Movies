@@ -31,6 +31,7 @@ public class MoviesRepository {
     public Observable<MoviesPage> getMoviesObservable(String path, int page) {
         return apiService.getMoviesObservable(path, page)
                 .compose(new RestCallTransformer<>());
+
     }
 
     public Observable<List<Video>> getMovieVideosObservable(int moviedId) {

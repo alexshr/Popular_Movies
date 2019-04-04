@@ -1,21 +1,19 @@
 package com.alexshr.popularmovies.ui.list;
 
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Transformations;
+import android.arch.paging.LivePagedListBuilder;
+import android.arch.paging.PagedList;
 import android.databinding.ObservableInt;
 
 import com.alexshr.popularmovies.AppConfig;
 import com.alexshr.popularmovies.R;
 import com.alexshr.popularmovies.api.MoviesRepository;
 import com.alexshr.popularmovies.data.Movie;
-import com.alexshr.popularmovies.data.MoviesPage;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.alexshr.popularmovies.viewmodel.BaseViewModel;
 
 import javax.inject.Inject;
 
-import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 import static com.alexshr.popularmovies.AppConfig.POPULAR_PATH;
@@ -25,59 +23,36 @@ import static com.alexshr.popularmovies.AppConfig.TOP_RATED_PATH;
  * Created by alexshr on 21.03.2018.
  */
 
-public class MovieListViewModel extends ViewModel {
+public class MovieListViewModel extends BaseViewModel {
 
-    private MoviesRepository repository;
+    private MoviesRepository repo;
 
-    private MutableLiveData<List<Movie>> moviesListData = new MutableLiveData<>();
-    private MutableLiveData<Throwable> errorData = new MutableLiveData<>();
-    private MutableLiveData<Boolean> progressData = new MutableLiveData<>();
+    private LiveData<PagedList<Movie>> pagedMoviesData;
+    private LiveData<Boolean> progressData;
+    private LiveData<Throwable> errorData;
 
-    private Integer nextPage;
-    private Integer totalPages;
-    private Integer scrollPosition;
-    private String path = AppConfig.POPULAR_PATH;
+    //private String path;
+
+    private int menuItemId;
+
+    //private String path = AppConfig.POPULAR_PATH;
     public final ObservableInt titleRes =
             new ObservableInt(R.string.popular_movies);
+    private int scrollPos;
 
     @Inject
     public MovieListViewModel(MoviesRepository rep) {
-        repository = rep;
+        repo = rep;
     }
 
-    public void init() {
-        errorData = new MutableLiveData<>();
-        progressData = new MutableLiveData<>();
-        if (path == null) moviesListData = new MutableLiveData<>();//to force reloading
-    }
+    public void switchTo(int menuItemId) {
+        if (this.menuItemId == menuItemId) return;
 
-    @Override
-    protected void onCleared() {
-        Timber.d("onClear");
-        moviesListData = null;
-    }
+        this.menuItemId = menuItemId;
 
-    public void loadApiPage() {
-        if (nextPage == null) nextPage = 1;
-        Timber.d("path=%s; nextPage=%d; mTotalPage=%d", path, nextPage, totalPages);
-        if (totalPages == null || nextPage <= totalPages) {
-            progressData.postValue(true);
-            repository.getMoviesObservable(path, nextPage)
-                    .doFinally(() -> progressData.postValue(false))
-                    .subscribe(this::onData, errorData::postValue);
-        }
-    }
+        String path = null;
 
-    private void onData(MoviesPage moviesPage) {
-        totalPages = moviesPage.getTotalPages();
-        nextPage = moviesPage.getPage() + 1;
-        updateMoviesData(moviesPage.getResults());
-        Timber.d("path=%s; nextPage=%d; mTotalPage=%d;", path, nextPage, totalPages);
-    }
-
-    public void startLoading(int menuId) {
-        //nextPage = null;
-        switch (menuId) {
+        switch (menuItemId) {
             case R.id.popular:
                 path = POPULAR_PATH;
                 titleRes.set(R.string.popular_movies);
@@ -86,67 +61,54 @@ public class MovieListViewModel extends ViewModel {
                 path = TOP_RATED_PATH;
                 titleRes.set(R.string.top_rated_movies);
                 break;
-            default:
-                path = null;
+            case R.id.favorites:
                 titleRes.set(R.string.favorites);
         }
 
-        startLoading();
-    }
+        Timber.d("path=%s", path);
 
-    public void startLoading() {
-        if (moviesListData.getValue() != null) {
-            moviesListData.getValue().clear();
-        }
         if (path != null) {
-            nextPage = 1;
-            loadApiPage();
-        } else loadFavorites();
+
+            MovieListDataSourceFactory dsFactory = new MovieListDataSourceFactory(repo, path, getCompositeDisposable());
+
+            PagedList.Config pagedConfig = new PagedList.Config.Builder()
+                    .setEnablePlaceholders(false)
+                    .setPageSize(AppConfig.PAGE_SIZE)
+                    .build();
+
+            pagedMoviesData = new LivePagedListBuilder<>(dsFactory, pagedConfig).build();
+
+            errorData = Transformations.switchMap(
+                    dsFactory.getDataSourceLiveData(), MovieListDataSource::getErrorData);
+            progressData = Transformations.switchMap(
+                    dsFactory.getDataSourceLiveData(), MovieListDataSource::getProgressData);
+        } else {
+            //TODO fetch favorites
+        }
     }
 
-    public void loadFavorites() {
-        repository.getFavoritesObservable()
+
+
+/*public void loadFavorites() {
+        repo.getFavoritesObservable()
                 .subscribeOn(Schedulers.io())
                 .subscribe(this::updateMoviesData);
+    }*/
+
+    public LiveData<PagedList<Movie>> getPagedMoviesData() {
+        return pagedMoviesData;
     }
 
-    private void updateMoviesData(List<Movie> pageData) {
-
-        List<Movie> data = new ArrayList<>();
-        if (moviesListData.getValue() != null) data.addAll(moviesListData.getValue());
-
-        data.addAll(pageData);
-
-        Timber.d("moviesListData.postValue size=%d", data.size());
-        moviesListData.postValue(data);
-    }
-
-    public MutableLiveData<List<Movie>> getMoviesListData() {
-        return moviesListData;
-    }
-
-    public MutableLiveData<Throwable> getErrorData() {
-        return errorData;
-    }
-
-    public MutableLiveData<Boolean> getProgressData() {
+    public LiveData<Boolean> getProgressData() {
         return progressData;
     }
 
-    public String getPath() {
-        return path;
+    public LiveData<Throwable> getErrorData() {
+        return errorData;
     }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public void setScrollPosition(Integer scrollPosition) {
-        this.scrollPosition = scrollPosition;
-    }
-
-    public Integer getScrollPosition() {
-        return scrollPosition;
+    public int getMenuItemId() {
+        return menuItemId;
     }
 }
 

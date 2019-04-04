@@ -4,6 +4,8 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
 
 import com.alexshr.popularmovies.BR;
 import com.google.gson.annotations.SerializedName;
@@ -35,6 +37,19 @@ public class Movie extends BaseObservable implements Parcelable {
     private String releaseDate;
 
     private boolean isFavorite;
+
+    public static DiffUtil.ItemCallback<Movie> DIFF_CALLBACK = new DiffUtil.ItemCallback<Movie>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull Movie oldItem, @NonNull Movie newItem) {
+            return oldItem.id==newItem.id;
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull Movie oldItem, @NonNull Movie newItem) {
+            return oldItem.posterPath.equals(newItem.posterPath)
+                    &&oldItem.title.equals(newItem.title);
+        }
+    };
 
     public Movie() {
     }

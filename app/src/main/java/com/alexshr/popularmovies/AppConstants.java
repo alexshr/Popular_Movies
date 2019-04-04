@@ -6,5 +6,6 @@ package com.alexshr.popularmovies;
 
 public interface AppConstants {
   String MOVIE_KEY ="movieId";
-    String PATH_KEY = "path";
+    String MENU_ITEM_KEY = "path";
+  String SCROLL_KEY = "scroll";
 }
