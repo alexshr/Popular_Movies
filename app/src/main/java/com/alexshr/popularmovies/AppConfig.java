@@ -29,4 +29,5 @@ public interface AppConfig {
     int CACHE_SIZE = 10 * 1024 * 1024;//10 mb
     int CACHE_OFFLINE_MAX_STALE = 60 * 60 * 24 * 28; // tolerate 4-weeks stale for offline
     int PAGE_SIZE = 40;
+    String DATABASE_NAME ="movies.db" ;
 }

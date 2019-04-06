@@ -1,7 +1,9 @@
 package com.alexshr.popularmovies.ui.list;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
+import android.arch.paging.DataSource;
 import android.arch.paging.LivePagedListBuilder;
 import android.arch.paging.PagedList;
 import android.databinding.ObservableInt;
@@ -28,8 +30,8 @@ public class MovieListViewModel extends BaseViewModel {
     private MoviesRepository repo;
 
     private LiveData<PagedList<Movie>> pagedMoviesData;
-    private LiveData<Boolean> progressData;
-    private LiveData<Throwable> errorData;
+    private LiveData<Boolean> progressData = new MutableLiveData<>();
+    private LiveData<Throwable> errorData = new MutableLiveData<>();
 
     //private String path;
 
@@ -67,23 +69,22 @@ public class MovieListViewModel extends BaseViewModel {
 
         Timber.d("path=%s", path);
 
-        if (path != null) {
+        PagedList.Config pagedConfig = new PagedList.Config.Builder()
+                .setEnablePlaceholders(false)
+                .setPageSize(AppConfig.PAGE_SIZE)
+                .build();
 
-            MovieListDataSourceFactory dsFactory = new MovieListDataSourceFactory(repo, path, getCompositeDisposable());
+        DataSource.Factory<Integer, Movie> dsFactory = path != null ?
+                new MovieListDataSourceFactory(repo, path, getCompositeDisposable()) ://api
+                repo.getFavoritesDSFactory();//dao
 
-            PagedList.Config pagedConfig = new PagedList.Config.Builder()
-                    .setEnablePlaceholders(false)
-                    .setPageSize(AppConfig.PAGE_SIZE)
-                    .build();
+        pagedMoviesData = new LivePagedListBuilder<>(dsFactory, pagedConfig).build();
 
-            pagedMoviesData = new LivePagedListBuilder<>(dsFactory, pagedConfig).build();
-
+        if (path != null) {//api
             errorData = Transformations.switchMap(
-                    dsFactory.getDataSourceLiveData(), MovieListDataSource::getErrorData);
+                    ((MovieListDataSourceFactory) dsFactory).getDataSourceLiveData(), MovieListDataSource::getErrorData);
             progressData = Transformations.switchMap(
-                    dsFactory.getDataSourceLiveData(), MovieListDataSource::getProgressData);
-        } else {
-            //TODO fetch favorites
+                    ((MovieListDataSourceFactory) dsFactory).getDataSourceLiveData(), MovieListDataSource::getProgressData);
         }
     }
 

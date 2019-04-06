@@ -1,5 +1,8 @@
 package com.alexshr.popularmovies.data;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.os.Parcel;
@@ -17,8 +20,10 @@ import static com.alexshr.popularmovies.AppConfig.POSTER_SIZE_W342;
 /**
  * Created by alexshr on 19.03.2018.
  */
+@Entity(tableName = "movies")
 public class Movie extends BaseObservable implements Parcelable {
 
+    @PrimaryKey
     @SerializedName("id")
     private Integer id;
     @SerializedName("vote_average")
@@ -36,6 +41,7 @@ public class Movie extends BaseObservable implements Parcelable {
     @SerializedName("release_date")
     private String releaseDate;
 
+    @Ignore
     private boolean isFavorite;
 
     public static DiffUtil.ItemCallback<Movie> DIFF_CALLBACK = new DiffUtil.ItemCallback<Movie>() {

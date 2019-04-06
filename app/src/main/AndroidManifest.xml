@@ -22,10 +22,10 @@
             </intent-filter>
         </activity>
 
-        <provider
+        <!--<provider
             android:name=".provider.MoviesProvider"
             android:authorities="com.alexshr.popularmovies"
-            android:exported="false" />
+            android:exported="false" />-->
     </application>
 
 </manifest>

@@ -1,5 +1,6 @@
 package com.alexshr.popularmovies.ui.detail;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
@@ -36,7 +37,7 @@ public class MovieDetailViewModel extends ViewModel {
 
     public void setMovie(Movie movie) {
         this.movie = movie;
-        movie.setFavorite(repository.isFavorite(movie.getId()));
+        //movie.setFavorite(repository.isFavorite(movie.getId()));
     }
 
     @Override
@@ -56,7 +57,11 @@ public class MovieDetailViewModel extends ViewModel {
         } else {
             repository.addToFavorites(movie);
         }
-        movie.setFavorite(!movie.isFavorite());
+        //movie.setFavorite(!movie.isFavorite());
+    }
+
+    public LiveData<Boolean> getIsFavoriteData(){
+        return repository.getIsFavoriteData(movie.getId());
     }
 
     public void loadVideosAndReviews() {

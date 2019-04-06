@@ -30,13 +30,12 @@ public class MovieListDataSource extends PageKeyedDataSource<Integer, Movie> {
         this.repo = repo;
         this.path = path;
         this.compositeDisposable = compositeDisposable;
-        Timber.d("path=%s",path);
+        Timber.d("path=%s", path);
     }
 
     private Observable<MoviesPage> getPageObservable(String path, int page) {
         return repo.getMoviesObservable(path, page)
                 .subscribeOn(AndroidSchedulers.mainThread())
-                .doOnError(errorData::postValue)
                 .doOnSubscribe(compositeDisposable::add)
                 .doOnSubscribe(disp -> progressData.postValue(true))
                 .doFinally(() -> progressData.postValue(false));
@@ -48,9 +47,9 @@ public class MovieListDataSource extends PageKeyedDataSource<Integer, Movie> {
 
         getPageObservable(path, START_PAGE)
                 .subscribe(mPage -> {
-                    Timber.d("loadInitial path=%s, page=%d",path,START_PAGE);
+                    Timber.d("loadInitial path=%s, page=%d", path, START_PAGE);
                     callback.onResult(mPage.getMovies(), null, mPage.getPage() + 1);
-                });
+                }, errorData::postValue);
     }
 
     @SuppressLint("CheckResult")
@@ -59,9 +58,9 @@ public class MovieListDataSource extends PageKeyedDataSource<Integer, Movie> {
 
         getPageObservable(path, params.key)
                 .subscribe(mPage -> {
-                    Timber.d("loadBefore path=%s, page=%d",path,params.key);
+                    Timber.d("loadBefore path=%s, page=%d", path, params.key);
                     callback.onResult(mPage.getMovies(), mPage.getPage() > 1 ? mPage.getPage() - 1 : null);
-                });
+                }, errorData::postValue);
     }
 
     @SuppressLint("CheckResult")
@@ -70,9 +69,9 @@ public class MovieListDataSource extends PageKeyedDataSource<Integer, Movie> {
 
         getPageObservable(path, params.key)
                 .subscribe(mPage -> {
-                    Timber.d("loadAfter path=%s, page=%d",path,params.key);
+                    Timber.d("loadAfter path=%s, page=%d", path, params.key);
                     callback.onResult(mPage.getMovies(), mPage.getPage() < mPage.getTotalPages() ? mPage.getPage() + 1 : null);
-                });
+                }, errorData::postValue);
     }
 
     public MutableLiveData<Boolean> getProgressData() {

@@ -1,12 +1,16 @@
 package com.alexshr.popularmovies.api;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Transformations;
+import android.arch.paging.DataSource;
+
 import com.alexshr.popularmovies.data.Movie;
 import com.alexshr.popularmovies.data.MovieReviews;
 import com.alexshr.popularmovies.data.MovieVideos;
 import com.alexshr.popularmovies.data.MoviesPage;
 import com.alexshr.popularmovies.data.Review;
 import com.alexshr.popularmovies.data.Video;
-import com.alexshr.popularmovies.provider.MoviesClient;
+import com.alexshr.popularmovies.db.AppDao;
 import com.alexshr.popularmovies.rx.RestCallTransformer;
 
 import java.util.List;
@@ -14,24 +18,24 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 
 @Singleton
 public class MoviesRepository {
     private ApiService apiService;
-    private MoviesClient favoritesClient;
+    private AppDao dao;
 
     @Inject
-    public MoviesRepository(ApiService apiService, MoviesClient favoritesClient) {
+    public MoviesRepository(ApiService apiService, AppDao dao) {
         this.apiService = apiService;
-        this.favoritesClient = favoritesClient;
-
+        this.dao = dao;
     }
 
     public Observable<MoviesPage> getMoviesObservable(String path, int page) {
         return apiService.getMoviesObservable(path, page)
                 .compose(new RestCallTransformer<>());
-
     }
 
     public Observable<List<Video>> getMovieVideosObservable(int moviedId) {
@@ -46,19 +50,28 @@ public class MoviesRepository {
                 .map(MovieReviews::getResults);
     }
 
-    public Observable<List<Movie>> getFavoritesObservable() {
-        return favoritesClient.getFavoritesObservable();
+    public DataSource.Factory<Integer, Movie> getFavoritesDSFactory() {
+        return dao.selectFavorites();
     }
 
     public void deleteFromFavorites(int movieId) {
-        favoritesClient.delete(movieId);
+        Completable.fromAction(() -> dao.deleteFromFavorites(movieId))
+                .subscribeOn(Schedulers.computation())
+                .subscribe(() -> {
+                });
     }
 
     public void addToFavorites(Movie movie) {
-        favoritesClient.insert(movie);
+
+        Completable.fromAction(() -> dao.addToFavorites(movie))
+                .subscribeOn(Schedulers.computation())
+                .subscribe(() -> {
+                });
+
+        // movie.setFavorite(true);
     }
 
-    public boolean isFavorite(int movieId) {
-        return favoritesClient.isFavorite(movieId);
+    public LiveData<Boolean> getIsFavoriteData(int movieId) {
+        return Transformations.map(dao.count(movieId), count -> count == 1);
     }
 }

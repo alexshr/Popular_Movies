@@ -100,6 +100,10 @@ public class MovieDetailFragment extends Fragment implements Injectable {
 
         viewModel.getErrorData().observe(this, this::showError);
 
+        viewModel.getIsFavoriteData().observe(this, isFavorite -> {
+            movie.setFavorite(isFavorite);
+        });
+
         if (!connectionChecker.isConnected()) showMessage(getString(R.string.no_internet));
     }
 

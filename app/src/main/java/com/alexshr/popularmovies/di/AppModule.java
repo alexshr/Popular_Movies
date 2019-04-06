@@ -1,10 +1,14 @@
 package com.alexshr.popularmovies.di;
 
 import android.app.Application;
+import android.arch.persistence.room.Room;
 import android.content.Context;
 
+import com.alexshr.popularmovies.AppConfig;
 import com.alexshr.popularmovies.BuildConfig;
 import com.alexshr.popularmovies.api.ApiService;
+import com.alexshr.popularmovies.db.AppDao;
+import com.alexshr.popularmovies.db.AppDb;
 import com.alexshr.popularmovies.util.ConnectionChecker;
 
 import java.io.File;
@@ -110,6 +114,16 @@ class AppModule {
     }
 
     //endregion
+
+
+    @Singleton
+    @Provides
+    AppDao provideDao(Context context) {
+        return Room.databaseBuilder(context,
+                AppDb.class,
+                AppConfig.DATABASE_NAME)
+                .build().moviesDao();
+    }
 
     @Singleton
     @Provides
