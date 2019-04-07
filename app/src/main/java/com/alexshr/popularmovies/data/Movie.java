@@ -1,17 +1,18 @@
 package com.alexshr.popularmovies.data;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.PrimaryKey;
-import android.databinding.BaseObservable;
-import android.databinding.Bindable;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
-import android.support.v7.util.DiffUtil;
 
 import com.alexshr.popularmovies.BR;
 import com.google.gson.annotations.SerializedName;
+
+import androidx.annotation.NonNull;
+import androidx.databinding.BaseObservable;
+import androidx.databinding.Bindable;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
 
 import static com.alexshr.popularmovies.AppConfig.BASE_POSTER_URL;
 import static com.alexshr.popularmovies.AppConfig.POSTER_SIZE_W185;

@@ -2,10 +2,11 @@ package com.alexshr.popularmovies.util;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 
 import com.alexshr.popularmovies.R;
+
+import androidx.appcompat.widget.AppCompatImageView;
 
 /**
  * Maintains an aspect ratio based on either width or height

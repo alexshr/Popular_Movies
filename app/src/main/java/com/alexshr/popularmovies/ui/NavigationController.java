@@ -1,13 +1,13 @@
 package com.alexshr.popularmovies.ui;
 
-import android.support.v4.app.FragmentManager;
-
 import com.alexshr.popularmovies.R;
 import com.alexshr.popularmovies.data.Movie;
 import com.alexshr.popularmovies.ui.detail.MovieDetailFragment;
 import com.alexshr.popularmovies.ui.list.MovieListFragment;
 
 import javax.inject.Inject;
+
+import androidx.fragment.app.FragmentManager;
 
 /**
  * Created by alexshr on 28.03.2018.

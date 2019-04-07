@@ -1,7 +1,5 @@
 package com.alexshr.popularmovies.ui.detail;
 
-import android.databinding.DataBindingComponent;
-import android.databinding.DataBindingUtil;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -11,6 +9,9 @@ import com.alexshr.popularmovies.data.Review;
 import com.alexshr.popularmovies.databinding.ReviewItemBinding;
 
 import java.util.Objects;
+
+import androidx.databinding.DataBindingComponent;
+import androidx.databinding.DataBindingUtil;
 
 /**
  * A RecyclerView adapter for {@link Review} class.

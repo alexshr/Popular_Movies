@@ -1,7 +1,6 @@
 package com.alexshr.popularmovies.di;
 
 import android.app.Application;
-import android.arch.persistence.room.Room;
 import android.content.Context;
 
 import com.alexshr.popularmovies.AppConfig;
@@ -16,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
 
+import androidx.room.Room;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.Cache;

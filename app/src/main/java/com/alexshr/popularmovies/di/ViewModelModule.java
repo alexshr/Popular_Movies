@@ -1,12 +1,11 @@
 package com.alexshr.popularmovies.di;
 
-import android.arch.lifecycle.ViewModel;
-import android.arch.lifecycle.ViewModelProvider;
-
 import com.alexshr.popularmovies.ui.detail.MovieDetailViewModel;
 import com.alexshr.popularmovies.ui.list.MovieListViewModel;
 import com.alexshr.popularmovies.viewmodel.ViewModelFactory;
 
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 import dagger.Binds;
 import dagger.Module;
 import dagger.multibindings.IntoMap;

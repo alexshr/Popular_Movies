@@ -1,13 +1,5 @@
 package com.alexshr.popularmovies.ui.list;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Transformations;
-import android.arch.paging.DataSource;
-import android.arch.paging.LivePagedListBuilder;
-import android.arch.paging.PagedList;
-import android.databinding.ObservableInt;
-
 import com.alexshr.popularmovies.AppConfig;
 import com.alexshr.popularmovies.R;
 import com.alexshr.popularmovies.api.MoviesRepository;
@@ -16,41 +8,48 @@ import com.alexshr.popularmovies.viewmodel.BaseViewModel;
 
 import javax.inject.Inject;
 
+import androidx.databinding.ObservableInt;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
+import androidx.paging.DataSource;
+import androidx.paging.LivePagedListBuilder;
+import androidx.paging.PagedList;
+import lombok.Getter;
 import timber.log.Timber;
 
 import static com.alexshr.popularmovies.AppConfig.POPULAR_PATH;
 import static com.alexshr.popularmovies.AppConfig.TOP_RATED_PATH;
 
-/**
- * Created by alexshr on 21.03.2018.
- */
-
 public class MovieListViewModel extends BaseViewModel {
 
-    private MoviesRepository repo;
-
-    private LiveData<PagedList<Movie>> pagedMoviesData;
-    private LiveData<Boolean> progressData = new MutableLiveData<>();
-    private LiveData<Throwable> errorData = new MutableLiveData<>();
-
-    //private String path;
-
-    private int menuItemId;
-
-    //private String path = AppConfig.POPULAR_PATH;
     public final ObservableInt titleRes =
             new ObservableInt(R.string.popular_movies);
-    private int scrollPos;
+    private MoviesRepository repo;
+
+    @Getter
+    private LiveData<PagedList<Movie>> pagedMoviesData;
+    @Getter
+    private LiveData<Boolean> progressData = new MutableLiveData<>();
+    @Getter
+    private LiveData<Throwable> errorData = new MutableLiveData<>();
+    @Getter
+    private int menuItemId = R.id.popular;
 
     @Inject
     public MovieListViewModel(MoviesRepository rep) {
         repo = rep;
     }
 
-    public void switchTo(int menuItemId) {
-        if (this.menuItemId == menuItemId) return;
+    public void syncData(int menuItemId) {
+        if (menuItemId != 0 && this.menuItemId != menuItemId) {
+            this.menuItemId = menuItemId;
+            pagedMoviesData = null;
+        }
+        if (pagedMoviesData == null) refreshData();
+    }
 
-        this.menuItemId = menuItemId;
+    private void refreshData() {
 
         String path = null;
 
@@ -88,28 +87,11 @@ public class MovieListViewModel extends BaseViewModel {
         }
     }
 
-
-
-/*public void loadFavorites() {
-        repo.getFavoritesObservable()
-                .subscribeOn(Schedulers.io())
-                .subscribe(this::updateMoviesData);
-    }*/
-
-    public LiveData<PagedList<Movie>> getPagedMoviesData() {
-        return pagedMoviesData;
-    }
-
-    public LiveData<Boolean> getProgressData() {
-        return progressData;
-    }
-
-    public LiveData<Throwable> getErrorData() {
-        return errorData;
-    }
-
-    public int getMenuItemId() {
-        return menuItemId;
+    public void switchTo(int menuItemId) {
+        if (this.menuItemId != menuItemId) {
+            this.menuItemId = menuItemId;
+            refreshData();
+        }
     }
 }
 

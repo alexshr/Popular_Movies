@@ -1,9 +1,6 @@
 package com.alexshr.popularmovies.ui.list;
 
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.paging.PageKeyedDataSource;
-import android.support.annotation.NonNull;
 
 import com.alexshr.popularmovies.api.MoviesRepository;
 import com.alexshr.popularmovies.data.Movie;
@@ -11,6 +8,9 @@ import com.alexshr.popularmovies.data.MoviesPage;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
+import androidx.paging.PageKeyedDataSource;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;

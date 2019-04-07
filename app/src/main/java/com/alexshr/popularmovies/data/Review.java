@@ -3,46 +3,25 @@ package com.alexshr.popularmovies.data;
 
 import com.google.gson.annotations.SerializedName;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class Review {
 
     @SerializedName("author")
+    @Getter
+    @Setter
     private String author;
     @SerializedName("content")
+    @Getter
+    @Setter
     private String content;
     @SerializedName("id")
+    @Getter
+    @Setter
     private String id;
     @SerializedName("url")
+    @Getter
+    @Setter
     private String url;
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
 }

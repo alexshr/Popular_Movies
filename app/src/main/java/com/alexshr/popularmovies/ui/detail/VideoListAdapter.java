@@ -1,7 +1,5 @@
 package com.alexshr.popularmovies.ui.detail;
 
-import android.databinding.DataBindingComponent;
-import android.databinding.DataBindingUtil;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -11,6 +9,9 @@ import com.alexshr.popularmovies.data.Video;
 import com.alexshr.popularmovies.databinding.VideoItemBinding;
 
 import java.util.Objects;
+
+import androidx.databinding.DataBindingComponent;
+import androidx.databinding.DataBindingUtil;
 
 public class VideoListAdapter extends DataBoundListAdapter<Video, VideoItemBinding> {
     private final DataBindingComponent dataBindingComponent;

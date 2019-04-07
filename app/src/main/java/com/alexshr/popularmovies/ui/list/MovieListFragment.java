@@ -1,14 +1,6 @@
 package com.alexshr.popularmovies.ui.list;
 
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,9 +16,17 @@ import com.alexshr.popularmovies.ui.NavigationController;
 import com.alexshr.popularmovies.util.AutoClearedValue;
 import com.alexshr.popularmovies.util.ConnectionChecker;
 import com.alexshr.popularmovies.util.SpacingItemDecoration;
+import com.google.android.material.snackbar.Snackbar;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import timber.log.Timber;
 
 import static com.alexshr.popularmovies.AppConstants.MENU_ITEM_KEY;
@@ -43,7 +43,7 @@ public class MovieListFragment extends Fragment implements Injectable {
     @Inject
     ConnectionChecker connectionChecker;
 
-    private android.databinding.DataBindingComponent dataBindingComponent = new FragmentDataBindingComponent(this);
+    private androidx.databinding.DataBindingComponent dataBindingComponent = new FragmentDataBindingComponent(this);
 
     private MovieListViewModel viewModel;
 
@@ -70,11 +70,12 @@ public class MovieListFragment extends Fragment implements Injectable {
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieListViewModel.class);
 
-        int menuItemId = (outState != null) ? outState.getInt(MENU_ITEM_KEY) : R.id.popular;
-
         initMovieList();
 
-        switchTo(menuItemId);
+        viewModel.syncData(outState != null ? outState.getInt(MENU_ITEM_KEY) : 0);
+
+        subscribe();
+        checkConnection();
 
         binding.get().setViewModel(viewModel);
     }
@@ -88,12 +89,10 @@ public class MovieListFragment extends Fragment implements Injectable {
         binding.get().movieList.addItemDecoration(new SpacingItemDecoration(1));
     }
 
-    private void switchTo(int menuItemId) {
+    private void subscribe() {
         MoviePagedListAdapter adapter = (MoviePagedListAdapter) binding.get().movieList.getAdapter();
-        viewModel.switchTo(menuItemId);
         viewModel.getErrorData().observe(this, this::showError);
         viewModel.getPagedMoviesData().observe(this, adapter::submitList);
-        checkConnection();
     }
 
     @Override
@@ -111,7 +110,9 @@ public class MovieListFragment extends Fragment implements Injectable {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switchTo(item.getItemId());
+        viewModel.switchTo(item.getItemId());
+        subscribe();
+        checkConnection();
         return true;
     }
 

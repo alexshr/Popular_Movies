@@ -3,12 +3,12 @@ package com.alexshr.popularmovies;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
-import android.support.annotation.NonNull;
 
 import com.alexshr.popularmovies.di.AppInjector;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasActivityInjector;
 import timber.log.Timber;

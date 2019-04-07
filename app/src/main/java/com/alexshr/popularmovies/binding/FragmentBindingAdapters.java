@@ -1,12 +1,13 @@
 package com.alexshr.popularmovies.binding;
 
 import android.content.res.ColorStateList;
-import android.databinding.BindingAdapter;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.widget.ImageView;
 
 import com.alexshr.popularmovies.GlideApp;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import androidx.databinding.BindingAdapter;
+import androidx.fragment.app.Fragment;
 
 /**
  * Binding adapters that work with a fragment instance.

@@ -1,11 +1,10 @@
 package com.alexshr.popularmovies.ui.list;
 
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.paging.DataSource;
-
 import com.alexshr.popularmovies.api.MoviesRepository;
 import com.alexshr.popularmovies.data.Movie;
 
+import androidx.lifecycle.MutableLiveData;
+import androidx.paging.DataSource;
 import io.reactivex.disposables.CompositeDisposable;
 import timber.log.Timber;
 

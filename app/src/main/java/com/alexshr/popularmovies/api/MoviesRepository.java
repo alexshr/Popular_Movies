@@ -1,9 +1,5 @@
 package com.alexshr.popularmovies.api;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Transformations;
-import android.arch.paging.DataSource;
-
 import com.alexshr.popularmovies.data.Movie;
 import com.alexshr.popularmovies.data.MovieReviews;
 import com.alexshr.popularmovies.data.MovieVideos;
@@ -18,6 +14,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
+import androidx.paging.DataSource;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;

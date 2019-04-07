@@ -1,9 +1,5 @@
 package com.alexshr.popularmovies.ui.detail;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
-
 import com.alexshr.popularmovies.api.MoviesRepository;
 import com.alexshr.popularmovies.data.Movie;
 import com.alexshr.popularmovies.data.Review;
@@ -13,18 +9,25 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import lombok.Getter;
 import timber.log.Timber;
 
 public class MovieDetailViewModel extends ViewModel {
 
     private MoviesRepository repository;
-
+    @Getter
     private Movie movie;
-
+    @Getter
     private MutableLiveData<List<Video>> videosData = new MutableLiveData<>();
+    @Getter
     private MutableLiveData<List<Review>> reviewsData = new MutableLiveData<>();
 
+    @Getter
     private MutableLiveData<Throwable> errorData = new MutableLiveData<>();
+    @Getter
     private MutableLiveData<Boolean> progressData = new MutableLiveData<>();
 
     private boolean isVideosLoading;
@@ -37,7 +40,6 @@ public class MovieDetailViewModel extends ViewModel {
 
     public void setMovie(Movie movie) {
         this.movie = movie;
-        //movie.setFavorite(repository.isFavorite(movie.getId()));
     }
 
     @Override
@@ -57,10 +59,9 @@ public class MovieDetailViewModel extends ViewModel {
         } else {
             repository.addToFavorites(movie);
         }
-        //movie.setFavorite(!movie.isFavorite());
     }
 
-    public LiveData<Boolean> getIsFavoriteData(){
+    public LiveData<Boolean> getIsFavoriteData() {
         return repository.getIsFavoriteData(movie.getId());
     }
 
@@ -80,25 +81,5 @@ public class MovieDetailViewModel extends ViewModel {
                     progressData.postValue(isVideosLoading);
                 })
                 .subscribe(reviewsData::postValue, errorData::postValue);
-    }
-
-    public Movie getMovie() {
-        return movie;
-    }
-
-    public MutableLiveData<List<Video>> getVideosData() {
-        return videosData;
-    }
-
-    public MutableLiveData<List<Review>> getReviewsData() {
-        return reviewsData;
-    }
-
-    public MutableLiveData<Throwable> getErrorData() {
-        return errorData;
-    }
-
-    public MutableLiveData<Boolean> getProgressData() {
-        return progressData;
     }
 }

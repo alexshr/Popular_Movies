@@ -16,9 +16,8 @@
 
 package com.alexshr.popularmovies.util;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import timber.log.Timber;
 
 /**
